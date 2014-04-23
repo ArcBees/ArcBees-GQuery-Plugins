@@ -42,14 +42,14 @@ public class ElasticImpl {
      */
     private static class StyleInfo {
         int span;
-        int marginRight;
-        int marginLeft;
-        int borderTopWidth;
-        int borderBottomWidth;
-        int marginTop;
-        int marginBottom;
+        double marginRight;
+        double marginLeft;
+        double borderTopWidth;
+        double borderBottomWidth;
+        double marginTop;
+        double marginBottom;
         int height;
-        int width;
+        double width;
         Integer floatColumn;
     }
 
@@ -82,21 +82,21 @@ public class ElasticImpl {
     private LayoutCommand layoutCommand;
     // Deque interface not supported by gwt
     private LinkedList<Integer> columnPriority;
-    private List<Integer> columnHeight;
+    private List<Double> columnHeight;
     private boolean useTranslate3d;
     private boolean useCalc;
-    private int columnWidth;
-    private int containerPaddingBottom;
-    private int containerPaddingTop;
-    private int containerPaddingLeft;
-    private int containerPaddingRight;
+    private double columnWidth;
+    private double containerPaddingBottom;
+    private double containerPaddingTop;
+    private double containerPaddingLeft;
+    private double containerPaddingRight;
     private HandlerRegistration resizeHandlerRegistration;
 
     public ElasticImpl(Element container, ElasticOption options) {
         this.container = container;
         this.options = options;
 
-        columnHeight = new ArrayList<Integer>();
+        columnHeight = new ArrayList<Double>();
         columnPriority = new LinkedList<Integer>();
         useTranslate3d = CSS_TRANSLATE_3D != null;
         useCalc = CSS_CALC != null;
@@ -121,19 +121,19 @@ public class ElasticImpl {
         // check if children returns text elements
         GQuery items = $container.children();
 
-        containerPaddingLeft = (int) $container.cur("paddingLeft", true);
-        containerPaddingRight = (int) $container.cur("paddingRight", true);
-        containerPaddingTop = (int) $container.cur("paddingTop", true);
-        containerPaddingBottom = (int) $container.cur("paddingBottom", true);
+        containerPaddingLeft = $container.cur("paddingLeft", true);
+        containerPaddingRight = $container.cur("paddingRight", true);
+        containerPaddingTop = $container.cur("paddingTop", true);
+        containerPaddingBottom = $container.cur("paddingBottom", true);
 
-        int totalColumnWidth = $container.innerWidth() - containerPaddingLeft - containerPaddingRight;
+        double totalColumnWidth = $container.innerWidth() - containerPaddingLeft - containerPaddingRight;
 
         int colNumber = calculateNumberOfColumn(totalColumnWidth);
 
         columnWidth = (totalColumnWidth - ((colNumber - 1) * options.getInnerColumnMargin())) / colNumber;
         columnWidth = max(columnWidth, options.getColumnWidth());
 
-        int initialTop = useTranslate3d ? 0 : containerPaddingTop;
+        double initialTop = useTranslate3d ? 0 : containerPaddingTop;
         for (int i = 0; i < colNumber; i++) {
             columnHeight.add(initialTop);
             columnPriority.add(i);
@@ -175,9 +175,8 @@ public class ElasticImpl {
     }
 
     private void setHeightContainer() {
-        int top = useTranslate3d ? containerPaddingTop : 0;
-        int height = top + containerPaddingBottom;
-        height += getMaxHeight(0, columnHeight.size());
+        double top = useTranslate3d ? containerPaddingTop : 0;
+        double height = top + containerPaddingBottom + getMaxHeight(0, columnHeight.size());
         $(container).css("minHeight", height + "px");
     }
 
@@ -193,7 +192,7 @@ public class ElasticImpl {
     private void placeItem(Element e, int numberOfCol) {
         StyleInfo si = getStyleInfo(e);
         int column;
-        int minHeight;
+        double minHeight;
         int span = min(si.span, numberOfCol);
         Integer floatColumn = si.floatColumn;
 
@@ -218,10 +217,10 @@ public class ElasticImpl {
                 column = floatColumn;
                 minHeight = getMaxHeight(column, column + span);
             } else {
-                minHeight = Integer.MAX_VALUE;
+                minHeight = Double.MAX_VALUE;
                 column = 0;
                 for (int i = 0; i <= columnHeight.size() - span; i++) {
-                    int maxHeight = getMaxHeight(i, i + span);
+                    double maxHeight = getMaxHeight(i, i + span);
                     if (maxHeight < minHeight) {
                         column = i;
                         minHeight = maxHeight;
@@ -252,11 +251,11 @@ public class ElasticImpl {
             }
             setPrefixedStyle(e, CSS_TRANSFORM, translate3d);
         } else {
-            int left = (columnWidth + options.getInnerColumnMargin()) * column + containerPaddingLeft;
+            double left = (columnWidth + options.getInnerColumnMargin()) * column + containerPaddingLeft;
             $(e).css("top", minHeight + "px").css("left", left + "px");
         }
 
-        int newHeight = minHeight + si.height + si.borderTopWidth + si.borderBottomWidth + si.marginBottom + si
+        double newHeight = minHeight + si.height + si.borderTopWidth + si.borderBottomWidth + si.marginBottom + si
                 .marginTop + options.getInnerRowMargin();
 
         for (int i = column; i < column + span; i++) {
@@ -265,10 +264,10 @@ public class ElasticImpl {
         }
     }
 
-    private int getMaxHeight(int start, int end) {
-        int maxHeight = columnHeight.get(start);
+    private double getMaxHeight(int start, int end) {
+        double maxHeight = columnHeight.get(start);
         for (int j = start + 1; j < end; j++) {
-            int tmp = columnHeight.get(j);
+            double tmp = columnHeight.get(j);
             if (tmp > maxHeight) {
                 maxHeight = tmp;
             }
@@ -276,11 +275,11 @@ public class ElasticImpl {
         return maxHeight;
     }
 
-    private int calculateNumberOfColumn(int totalColumnWidth) {
+    private int calculateNumberOfColumn(double totalColumnWidth) {
         int innerMargin = options.getInnerColumnMargin();
         int columnWidth = options.getColumnWidth();
 
-        int columnNbr = (totalColumnWidth + innerMargin) / (columnWidth + innerMargin);
+        int columnNbr = (int) ((totalColumnWidth + innerMargin) / (columnWidth + innerMargin));
 
         return max(options.getMinimalNumberOfColumn(), min(columnNbr, options.getMaximalNumberOfColumn()));
     }
@@ -291,10 +290,10 @@ public class ElasticImpl {
         String width;
         if (useCalc) {
             double weight = (double) span / nbrOfCol;
-            si.width = (int) (100 * weight);
+            si.width = 100 * weight;
             double innerMarginPart = (double) (options.getInnerColumnMargin() * (nbrOfCol - 1)) * weight;
             width = CSS_CALC + "(" + si.width + "%" +
-                    " - " + (int) (si.marginLeft + si.marginRight + innerMarginPart + (containerPaddingLeft
+                    " - " + (si.marginLeft + si.marginRight + innerMarginPart + (containerPaddingLeft
                     + containerPaddingRight) * weight) + "px" +
                     " + " + options.getInnerColumnMargin() * (span - 1) + "px)";
         } else {
@@ -317,7 +316,7 @@ public class ElasticImpl {
             floatColumn = -span;
         } else {
             try {
-                floatColumn = Integer.parseInt(floatValue);
+                floatColumn = Integer.parseInt(floatValue) - 1;
             } catch (NumberFormatException ignored) {
             }
         }
@@ -327,12 +326,12 @@ public class ElasticImpl {
         StyleInfo styleInfo = new StyleInfo();
         styleInfo.span = getSpan(e);
         styleInfo.floatColumn = floatColumn;
-        styleInfo.marginRight = (int) $e.cur("marginRight", true);
-        styleInfo.marginLeft = (int) $e.cur("marginLeft", true);
-        styleInfo.borderTopWidth = (int) $e.cur("borderTopWidth", true);
-        styleInfo.borderBottomWidth = (int) $e.cur("borderBottomWidth", true);
-        styleInfo.marginTop = (int) $e.cur("marginTop", true);
-        styleInfo.marginBottom = (int) $e.cur("marginBottom", true);
+        styleInfo.marginRight = $e.cur("marginRight", true);
+        styleInfo.marginLeft = $e.cur("marginLeft", true);
+        styleInfo.borderTopWidth = $e.cur("borderTopWidth", true);
+        styleInfo.borderBottomWidth = $e.cur("borderBottomWidth", true);
+        styleInfo.marginTop = $e.cur("marginTop", true);
+        styleInfo.marginBottom = $e.cur("marginBottom", true);
 
         $e.data(STYLE_INFO_KEY, styleInfo);
         $e.css("position", "absolute");
