@@ -16,6 +16,8 @@
     <modules>
         <module>tooltip</module>
         <module>tooltip-sample</module>
+	<module>elastic</module>
+        <module>elastic-sample</module>
     </modules>
 
     <name>ArcBees GQuery Plugins</name>
@@ -75,8 +77,8 @@
 
     <properties>
         <!-- client -->
-        <gquery.version>1.4.0</gquery.version>
-        <gwt.version>2.5.1</gwt.version>
+        <gquery.version>1.4.2-SNAPSHOT</gquery.version>
+        <gwt.version>2.6.0</gwt.version>
         <gwt.style>OBF</gwt.style>
         <junit.version>4.11</junit.version>
 
@@ -229,5 +231,12 @@
             <version>${gquery.version}</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>com.google.gwt</groupId>
+            <artifactId>gwt-user</artifactId>
+            <version>${gwt.version}</version>
+            <scope>compile</scope>
+        </dependency>
+
     </dependencies>
 </project>
