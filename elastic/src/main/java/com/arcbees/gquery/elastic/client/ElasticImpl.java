@@ -1,3 +1,19 @@
+/**
+ * Copyright 2014 ArcBees Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ */
+
 package com.arcbees.gquery.elastic.client;
 
 import java.util.ArrayList;
@@ -22,7 +38,7 @@ import static com.google.gwt.query.client.GQuery.$;
 
 public class ElasticImpl {
     /**
-     * Object where we store some style info in order to avoid browsers reflow
+     * Object where we store some style info in order to avoid browser reflows
      */
     private static class StyleInfo {
         int span;
@@ -53,7 +69,6 @@ public class ElasticImpl {
         }
     }
 
-
     private static final String STYLE_INFO_KEY = "__ELASTIC_STYLE_INFO";
     private static final String FIRST = "first";
     private static final String LAST = "last";
@@ -61,6 +76,7 @@ public class ElasticImpl {
     private static final String CSS_TRANSFORM = CSS_FEATURE_DETECTOR.getPrefixedTransform();
     private static final String CSS_TRANSLATE_3D = CSS_FEATURE_DETECTOR.getPrefixedTranslate3d();
     private static final String CSS_CALC = CSS_FEATURE_DETECTOR.getPrefixedCalc();
+
     private final ElasticOption options;
     private Element container;
     private LayoutCommand layoutCommand;
@@ -299,6 +315,11 @@ public class ElasticImpl {
             floatColumn = 0;
         } else if (LAST.equalsIgnoreCase(floatValue)) {
             floatColumn = -span;
+        } else {
+            try {
+                floatColumn = Integer.parseInt(floatValue);
+            } catch (NumberFormatException ignored) {
+            }
         }
 
         GQuery $e = $(e);
@@ -325,7 +346,6 @@ public class ElasticImpl {
 
         return styleInfo;
     }
-
 
     private int getSpan(Element element) {
         String attributeValue = element.getAttribute("data-elastic-span");
