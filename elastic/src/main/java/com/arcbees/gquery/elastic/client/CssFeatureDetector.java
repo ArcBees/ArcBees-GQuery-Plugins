@@ -40,7 +40,6 @@ public class CssFeatureDetector {
         if (prefixedTransformComputed) {
             return prefixedTransform;
         }
-
         prefixedTransformComputed = true;
 
         for (String prefix : PREFIXES) {
@@ -54,8 +53,6 @@ public class CssFeatureDetector {
 
         return null;
     }
-
-    // TODO
 
     public String getPrefixedCalc() {
         if (prefixedCalcComputed) {

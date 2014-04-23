@@ -72,6 +72,5 @@
             <version>${gquery.version}</version>
             <scope>compile</scope>
         </dependency>
-
     </dependencies>
 </project>
